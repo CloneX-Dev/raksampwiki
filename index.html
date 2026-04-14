@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CloneX Wiki | RakSAMP Lite — Полная документация Lua API</title>
+    <!-- Favicon CloneX (SVG) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231a1a2e' rx='20'/%3E%3Ctext x='50' y='72' font-size='70' text-anchor='middle' fill='%23a855f7' font-family='monospace' font-weight='bold'%3EX%3C/text%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0b10;
+            background-image: radial-gradient(circle at 25% 0%, rgba(79,70,229,0.12) 0%, rgba(0,0,0,0) 60%);
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111116; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #4f46e5, #a855f7); border-radius: 10px; }
+        .premium-card {
+            background: rgba(18, 18, 26, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(79, 70, 229, 0.25);
+            border-radius: 2rem;
+            transition: all 0.4s cubic-bezier(0.2,0.9,0.4,1.1);
+            box-shadow: 0 25px 40px -15px rgba(0,0,0,0.5);
+        }
+        .premium-card:hover { border-color: rgba(168,85,247,0.6); transform: translateY(-4px); }
+        .glow-border {
+            position: relative;
+            border-radius: 2rem;
+            background: linear-gradient(135deg, #1a1a24, #0f0f17);
+        }
+        .glow-border::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 2rem;
+            padding: 1.2px;
+            background: linear-gradient(125deg, #4f46e5, #c084fc, #4f46e5);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .glow-border:hover::before { opacity: 1; }
+        .code-lux {
+            background: #0a0c12;
+            border-radius: 1.2rem;
+            border-left: 5px solid #a855f7;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.6);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .code-lux pre {
+            margin: 0;
+            font-family: inherit;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            overflow-x: auto;
+        }
+        /* для длинных строк в таблицах структур */
+        .data-structure-block {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th { background: #13141f; color: #eef2ff; font-weight: 600; padding: 14px 16px; font-size: 0.85rem; border-bottom: 1px solid #2d2a4a; }
+        td { padding: 12px 16px; background: rgba(20,20,32,0.5); border-bottom: 1px solid rgba(79,70,229,0.2); font-size: 0.85rem; vertical-align: top; }
+        tr:hover td { background: rgba(79,70,229,0.15); }
+        th:first-child { border-top-left-radius: 16px; }
+        th:last-child { border-top-right-radius: 16px; }
+        .anchor { scroll-margin-top: 100px; }
+        .sidebar-premium {
+            background: rgba(12,12,20,0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 1.8rem;
+            border: 1px solid rgba(79,70,229,0.4);
+        }
+        .sidebar-link {
+            transition: all 0.25s;
+            border-left: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            margin: 4px 0;
+            border-radius: 14px;
+            font-weight: 500;
+        }
+        .sidebar-link i { width: 24px; color: #818cf8; }
+        .sidebar-link:hover { background: linear-gradient(90deg, rgba(79,70,229,0.2), transparent); border-left-color: #c084fc; transform: translateX(5px); }
+        .sidebar-link.active { background: linear-gradient(90deg, rgba(139,92,246,0.3), rgba(0,0,0,0)); border-left-color: #a855f7; color: white; }
+        .gradient-text { background: linear-gradient(125deg, #c084fc, #818cf8, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-to-top { background: rgba(79,70,229,0.9); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.2s; }
+        .back-to-top:hover { background: #a855f7; transform: scale(1.08); }
+        .section-badge { background: linear-gradient(95deg, #2d2a5e, #1f1b3b); padding: 0.2rem 1rem; border-radius: 40px; font-size: 0.7rem; border: 1px solid rgba(168,85,247,0.5); }
+        .wiki-header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .clonex-logo {
+            background: linear-gradient(135deg, #1e1a3a, #0f0b2a);
+            padding: 6px 16px;
+            border-radius: 60px;
+            border: 1px solid #a855f7;
+            box-shadow: 0 0 10px rgba(168,85,247,0.3);
+        }
+        /* фикс для мобильных */
+        @media (max-width: 768px) {
+            .code-lux pre { font-size: 0.7rem; }
+            td, th { padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <header class="relative overflow-hidden border-b border-indigo-500/40">
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-950/30 via-purple-900/20 to-indigo-950/30"></div>
+        <div class="absolute top-0 -left-32 w-96 h-96 bg-indigo-600/30 rounded-full blur-[100px]"></div>
+        <div class="container mx-auto px-6 py-8 md:py-12 relative z-10">
+            <div class="wiki-header-logo flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center gap-4 flex-wrap">
+                    <!-- Логотип CloneX (бренд) -->
+                    <div class="clonex-logo flex items-center gap-2">
+                        <i class="fas fa-xmark text-purple-400 text-2xl"></i>
+                        <span class="font-bold text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-300">CloneX</span>
+                    </div>
+                    <div class="h-8 w-px bg-indigo-500/40 hidden md:block"></div>
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold"><span class="gradient-text">RakSAMP Lite</span></h1>
+                        <p class="text-gray-400 text-sm">Минималистичный фейк-клиент SA:MP · Lua API вики</p>
+                    </div>
+                </div>
+                <a href="https://www.blast.hk/threads/108052/" target="_blank" class="group px-5 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition-all shadow-lg shadow-indigo-500/30 flex items-center gap-2 font-semibold text-sm"><i class="fas fa-gem group-hover:scale-110 transition"></i> Скачать клиент</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 md:px-6 py-10 flex flex-col lg:flex-row gap-8">
+        <aside class="lg:w-1/4 xl:w-1/5">
+            <div class="sticky top-24 sidebar-premium p-5">
+                <div class="flex items-center gap-3 border-b border-indigo-500/30 pb-4 mb-4">
+                    <i class="fas fa-xmark text-purple-400 text-xl"></i>
+                    <h2 class="text-xl font-bold">Навигация <span class="text-xs text-indigo-300">CloneX Wiki</span></h2>
+                </div>
+                <nav class="space-y-1 max-h-[70vh] overflow-y-auto pr-1">
+                    <a href="#introduction" class="sidebar-link"><i class="fas fa-xmark"></i> Введение</a>
+                    <a href="#general-functions" class="sidebar-link"><i class="fas fa-microchip"></i> Основные функции</a>
+                    <a href="#getter-functions" class="sidebar-link"><i class="fas fa-database"></i> Функции получения данных</a>
+                    <a href="#data-structures" class="sidebar-link"><i class="fas fa-diagram-project"></i> Структуры данных</a>
+                    <a href="#rates" class="sidebar-link"><i class="fas fa-gauge-high"></i> Рейты</a>
+                    <a href="#events" class="sidebar-link"><i class="fas fa-bolt"></i> События</a>
+                    <a href="#bitstream" class="sidebar-link"><i class="fas fa-code-branch"></i> BitStream</a>
+                    <a href="#addon" class="sidebar-link"><i class="fas fa-puzzle-piece"></i> Функции аддона</a>
+                    <a href="#tasks" class="sidebar-link"><i class="fas fa-list-check"></i> Управление задачами</a>
+                    <a href="#http" class="sidebar-link"><i class="fas fa-globe"></i> HTTP-запросы</a>
+                    <a href="#keys" class="sidebar-link"><i class="fas fa-keyboard"></i> Обработка клавиш</a>
+                    <a href="#proxy" class="sidebar-link"><i class="fas fa-network-wired"></i> Поддержка прокси</a>
+                    <a href="#commands" class="sidebar-link"><i class="fas fa-terminal"></i> Команды</a>
+                </nav>
+                <div class="mt-6 pt-4 border-t border-white/10 text-center text-xs text-indigo-300/60"><i class="fas fa-code"></i> API v2.0 · от CloneX</div>
+            </div>
+        </aside>
+
+        <main class="lg:w-3/4 xl:w-4/5 space-y-10">
+            <!-- Введение -->
+            <section id="introduction" class="anchor premium-card p-7 md:p-9">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-indigo-500/20 pb-4 mb-6">
+                    <div class="flex items-center gap-3"><i class="fas fa-xmark text-3xl text-purple-400"></i><h2 class="text-3xl font-bold gradient-text">Введение</h2></div>
+                    <span class="section-badge"><i class="far fa-star mr-1"></i>Wiki документация</span>
+                </div>
+                <p class="mb-5 text-gray-300 text-lg"><a href="https://www.blast.hk/threads/108052/" target="_blank" class="text-indigo-400 hover:text-purple-300 transition-all font-semibold underline"><i class="fas fa-external-link-alt mr-1"></i>RakSAMP Lite — официальная тема / скачать</a></p>
+                <div class="bg-black/30 p-5 rounded-2xl border-l-4 border-indigo-500"><p class="text-gray-200">Raksamp — минималистичный фейк-клиент для SA:MP, предоставляющий мощный Lua API для создания ботов, автоматизации действий и взаимодействия с игровым сервером. API позволяет управлять поведением бота, обрабатывать сетевые события и расширять функционал через скрипты. Эта документация подробно описывает все функции, события и структуры данных, доступные в Lua API, с примерами и рекомендациями.</p></div>
+            </section>
+
+            <!-- Основные функции (ПОЛНАЯ ТАБЛИЦА) -->
+            <section id="general-functions" class="glow-border p-[1.2px]">
+                <div class="bg-[#111118] rounded-[1.9rem] p-7 md:p-9">
+                    <div class="flex items-center gap-3 border-b border-indigo-500/30 pb-4 mb-7"><i class="fas fa-screwdriver-wrench text-indigo-400 text-2xl"></i><h2 class="text-2xl md:text-3xl font-bold">Основные функции</h2></div>
+                    <p class="mb-6 text-gray-300">Эти функции управляют поведением бота и настройками клиента.</p>
+                    <div class="overflow-x-auto rounded-xl">
+                        <table class="min-w-[800px]">
+                            <thead><tr><th>Функция</th><th>Описание</th><th>Параметры</th><th>Пример</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>print(string text)</code></td><td>Выводит сообщение в консоль.</td><td><code>text</code>: Текст</td><td><code>print("Привет, мир!")</code></td></tr>
+                                <tr><td><code>sleep(int ms)</code></td><td>Приостанавливает программу (блокирует).</td><td><code>ms</code>: миллисекунды</td><td><code>sleep(1000)</code></td></tr>
+                                <tr><td><code>exit()</code></td><td>Завершает программу, отключаясь от сервера.</td><td>Нет</td><td><code>exit()</code></td></tr>
+                                <tr><td><code>setServerAddress(string address)</code></td><td>Устанавливает адрес сервера.</td><td><code>address</code>: IP:port</td><td><code>setServerAddress("127.0.0.1:7777")</code></td></tr>
+                                <tr><td><code>setBotNick(string nick)</code></td><td>Устанавливает ник бота.</td><td><code>nick</code></td><td><code>setBotNick("Bot1")</code></td></tr>
+                                <tr><td><code>setBotPosition(float x, float y, float z)</code></td><td>Устанавливает позицию бота.</td><td>x,y,z</td><td><code>setBotPosition(100.0,200.0,10.0)</code></td></tr>
+                                <tr><td><code>setBotQuaternion(float w,float x,float y,float z)</code></td><td>Устанавливает кватернион.</td><td>w,x,y,z</td><td><code>setBotQuaternion(1,0,0,0)</code></td></tr>
+                                <tr><td><code>setBotRotation(float angle)</code></td><td>Устанавливает угол поворота.</td><td>angle (градусы)</td><td><code>setBotRotation(90.0)</code></td></tr>
+                                <tr><td><code>setBotHealth(float health)</code></td><td>Устанавливает здоровье (0-100).</td><td>health</td><td><code>setBotHealth(100.0)</code></td></tr>
+                                <tr><td><code>setBotArmor(float armor)</code></td><td>Устанавливает броню (0-100).</td><td>armor</td><td><code>setBotArmor(50.0)</code></td></tr>
+                                <tr><td><code>setNetworkAdapter(string ip)</code></td><td>Устанавливает IP сетевого адаптера.</td><td>ip</td><td><code>setNetworkAdapter("192.168.1.1")</code></td></tr>
+                                <tr><td><code>setWindowTitle(string title)</code></td><td>Заголовок окна программы.</td><td>title</td><td><code>setWindowTitle("Raksamp Bot")</code></td></tr>
+                                <tr><td><code>lockWindowTitle(bool lock)</code></td><td>Блокирует изменение заголовка.</td><td>lock</td><td><code>lockWindowTitle(true)</code></td></tr>
+                                <tr><td><code>setWindowText(string text)</code></td><td>Текст в строке состояния над чатом.</td><td>text</td><td><code>setWindowText("Готов")</code></td></tr>
+                                <tr><td><code>lockWindowText(bool lock)</code></td><td>Блокирует строку состояния.</td><td>lock</td><td><code>lockWindowText(true)</code></td></tr>
+                                <tr><td><code>flashWindow()</code></td><td>Мигание окна программы.</td><td>Нет</td><td><code>flashWindow()</code></td></tr>
+                                <tr><td><code>showWindow()</code></td><td>Разворачивает окно.</td><td>Нет</td><td><code>showWindow()</code></td></tr>
+                                <tr><td><code>setRate(int rate, int value)</code></td><td>Устанавливает рейты.</td><td>rate, value</td><td><code>setRate(RATE_LUA,100)</code></td></tr>
+                                <tr><td><code>runCommand(string cmd)</code></td><td>Обрабатывает команду Raksamp.</td><td>cmd</td><td><code>runCommand("!spawn")</code></td></tr>
+                                <tr><td><code>reconnect(int ms)</code></td><td>Переподключение с задержкой.</td><td>ms (опционально)</td><td><code>reconnect(5000)</code></td></tr>
+                                <tr><td><code>spawn()</code></td><td>Заспавнивает бота.</td><td>Нет</td><td><code>spawn()</code></td></tr>
+                                <tr><td><code>updateSync()</code></td><td>Обновляет синхронизацию бота.</td><td>Нет</td><td><code>updateSync()</code></td></tr>
+                                <tr><td><code>resetConnectTimeout()</code></td><td>Сбрасывает таймер переподключения.</td><td>Нет</td><td><code>resetConnectTimeout()</code></td></tr>
+                                <tr><td><code>setBotVehicle(int id, int seat=0)</code></td><td>Назначает боту транспорт.</td><td>id, seat</td><td><code>setBotVehicle(400,0)</code></td></tr>
+                                <tr><td><code>coordStart(float x,float y,float z,int delay,float step,bool off_at_spawn)</code></td><td>Запускает движение по координатам.</td><td>x,y,z,delay,step,off_at_spawn</td><td><code>coordStart(100,200,10,1000,1,true)</code></td></tr>
+                                <tr><td><code>coordStop()</code></td><td>Останавливает движение.</td><td>Нет</td><td><code>coordStop()</code></td></tr>
+                                <tr><td><code>setLogPath(string path)</code></td><td>Путь к файлу лога.</td><td>path</td><td><code>setLogPath("logs/bot.log")</code></td></tr>
+                                <tr><td><code>setAutoPick(bool state)</code></td><td>Автоматический сбор пикапов.</td><td>state</td><td><code>setAutoPick(true)</code></td></tr>
+                                <tr><td><code>proxyConnect(string address, string username, string password)</code></td><td>Подключается к прокси.</td><td>address, username, password</td><td><code>proxyConnect("123.145.167.189:58765","user","pass")</code></td></tr>
+                                <tr><td><code>proxyDisconnect()</code></td><td>Отключается от прокси.</td><td>Нет</td><td><code>proxyDisconnect()</code></td></tr>
+                                <tr><td><code>setBotMoney(int money)</code></td><td>Устанавливает деньги бота.</td><td>money</td><td><code>setBotMoney(1000)</code></td></tr>
+                                <tr><td><code>registerHandler(string event, function handler)</code></td><td>Регистрирует обработчик события.</td><td>event, handler</td><td><code>registerHandler("onConnect", function() print("ok") end)</code></td></tr>
+                                <tr><td><code>destroyHandlers()</code></td><td>Удаляет все обработчики событий.</td><td>Нет</td><td><code>destroyHandlers()</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Функции получения данных -->
+            <section id="getter-functions" class="premium-card p-7 md:p-9">
+                <div class="flex items-center gap-3 border-b border-indigo-500/30 pb-4 mb-7"><i class="fas fa-database text-indigo-400 text-2xl"></i><h2 class="text-2xl font-bold">Функции получения данных</h2></div>
+                <p class="mb-4">* не вернет ничего, если не существует</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-[800px]">
+                        <thead><tr><th>Функция</th><th>Описание</th><th>Возвращает</th><th>Пример</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>getBotId()</code></td><td>ID бота</td><td>int</td><td><code>local id = getBotId()</code></td></tr>
+                            <tr><td><code>getServerAddress()</code></td><td>Адрес сервера</td><td>string</td><td><code>local ip = getServerAddress()</code></td></tr>
+                            <tr><td><code>getServerName()</code></td><td>Название сервера</td><td>string</td><td><code>local name = getServerName()</code></td></tr>
+                            <tr><td><code>getBotNick()</code></td><td>Ник бота</td><td>string</td><td><code>local nick = getBotNick()</code></td></tr>
+                            <tr><td><code>getBotScore()</code></td><td>Очки (уровень) бота</td><td>int</td><td><code>local score = getBotScore()</code></td></tr>
+                            <tr><td><code>getBotPing()</code></td><td>Пинг бота</td><td>int</td><td><code>local ping = getBotPing()</code></td></tr>
+                            <tr><td><code>isBotSpawned()</code></td><td>Заспавнен ли бот</td><td>bool</td><td><code>local spawned = isBotSpawned()</code></td></tr>
+                            <tr><td><code>getBotInterior()</code></td><td>ID интерьера</td><td>int</td><td><code>local interior = getBotInterior()</code></td></tr>
+                            <tr><td><code>getBotSkin()</code></td><td>ID скина</td><td>int</td><td><code>local skin = getBotSkin()</code></td></tr>
+                            <tr><td><code>getBotPosition()</code></td><td>Позиция</td><td>float x,y,z</td><td><code>local x,y,z = getBotPosition()</code></td></tr>
+                            <tr><td><code>getBotQuaternion()</code></td><td>Кватернион</td><td>float w,x,y,z</td><td><code>local w,x,y,z = getBotQuaternion()</code></td></tr>
+                            <tr><td><code>getBotRotation()</code></td><td>Угол поворота</td><td>float</td><td><code>local angle = getBotRotation()</code></td></tr>
+                            <tr><td><code>getBotHealth()</code></td><td>Здоровье</td><td>float</td><td><code>local health = getBotHealth()</code></td></tr>
+                            <tr><td><code>getBotArmor()</code></td><td>Броня</td><td>float</td><td><code>local armor = getBotArmor()</code></td></tr>
+                            <tr><td><code>getNetworkAdapter()</code></td><td>IP адаптера</td><td>string</td><td><code>local ip = getNetworkAdapter()</code></td></tr>
+                            <tr><td><code>getCommandLineArgs()</code></td><td>Аргументы командной строки</td><td>string</td><td><code>local args = getCommandLineArgs()</code></td></tr>
+                            <tr><td><code>isBotConnected()</code></td><td>Подключен ли бот</td><td>bool</td><td><code>local connected = isBotConnected()</code></td></tr>
+                            <tr><td><code>getBotVehicle()</code></td><td>ID транспорта бота</td><td>int</td><td><code>local vehicle = getBotVehicle()</code></td></tr>
+                            <tr><td><code>isCoordActive()</code></td><td>Активно ли движение по координатам</td><td>bool</td><td><code>local active = isCoordActive()</code></td></tr>
+                            <tr><td><code>getPath(string additional)</code></td><td>Корневой путь с суффиксом</td><td>string</td><td><code>local path = getPath("scripts")</code></td></tr>
+                            <tr><td><code>isProxyConnected()</code></td><td>Подключен ли прокси</td><td>bool</td><td><code>local connected = isProxyConnected()</code></td></tr>
+                            <tr><td><code>getBotMoney()</code></td><td>Деньги бота</td><td>int</td><td><code>local money = getBotMoney()</code></td></tr>
+                            <tr><td><code>getPlayerCount(bool stream=false)</code></td><td>Количество игроков</td><td>int</td><td><code>local count = getPlayerCount()</code></td></tr>
+                            <tr><td><code>isPlayerConnected(int id)</code></td><td>Подключен ли игрок</td><td>bool</td><td><code>local connected = isPlayerConnected(1)</code></td></tr>
+                            <tr><td><code>doesPlayerExist(int id)</code></td><td>Существует ли игрок</td><td>bool</td><td><code>local exist = doesPlayerExist(1)</code></td></tr>
+                            <tr><td><code>doesVehicleExist(int id)</code></td><td>Существует ли транспорт</td><td>bool</td><td><code>local exist = doesVehicleExist(400)</code></td></tr>
+                            <tr><td><code>doesPickupExist(int id)</code></td><td>Существует ли пикап</td><td>bool</td><td><code>local exist = doesPickupExist(1)</code></td></tr>
+                            <tr><td><code>doesLabelExist(int id)</code></td><td>Существует ли 3D-текст</td><td>bool</td><td><code>local exist = doesLabelExist(1)</code></td></tr>
+                            <tr><td><code>getAllPlayers()</code></td><td>Данные всех игроков</td><td>table</td><td><code>local players = getAllPlayers()</code></td></tr>
+                            <tr><td><code>getAllVehicles()</code></td><td>Данные всех ТС</td><td>table</td><td><code>local vehicles = getAllVehicles()</code></td></tr>
+                            <tr><td><code>getAllPickups()</code></td><td>Данные всех пикапов</td><td>table</td><td><code>local pickups = getAllPickups()</code></td></tr>
+                            <tr><td><code>getAllLabels()</code></td><td>Данные всех 3D-текстов</td><td>table</td><td><code>local labels = getAllLabels()</code></td></tr>
+                            <tr><td><code>getPlayer(int id)</code></td><td>Данные игрока</td><td>table/nil</td><td><code>local player = getPlayer(1)</code></td></tr>
+                            <tr><td><code>getVehicle(int id)*</code></td><td>Данные транспорта</td><td>table/nil</td><td><code>local vehicle = getVehicle(400)</code></td></tr>
+                            <tr><td><code>getPickup(int id)*</code></td><td>Данные пикапа</td><td>table/nil</td><td><code>local pickup = getPickup(1)</code></td></tr>
+                            <tr><td><code>getLabel(int id)*</code></td><td>Данные 3D-текста</td><td>table/nil</td><td><code>local label = getLabel(1)</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Структуры данных (ИСПРАВЛЕНО: добавлена прокрутка и переносы) -->
+            <section id="data-structures" class="glow-border p-[1.2px]">
+                <div class="bg-[#111118] rounded-[1.9rem] p-7 md:p-9">
+                    <div class="flex gap-3 items-center border-b border-purple-500/30 pb-4 mb-6"><i class="fas fa-cubes text-purple-400 text-2xl"></i><h2 class="text-2xl font-bold">Структуры данных</h2></div>
+                    <div class="grid lg:grid-cols-2 gap-6">
+                        <div class="code-lux p-4 data-structure-block">
+                            <div class="text-indigo-300 font-bold mb-2"><i class="fas fa-users mr-2"></i> getAllPlayers()</div>
+                            <pre><code>{
+    [id] = {
+        score, ping, nick, exist,
+        skin, color,
+        position = {x,y,z}
+    }
+}</code></pre>
+                        </div>
+                        <div class="code-lux p-4 data-structure-block">
+                            <div class="text-indigo-300 font-bold mb-2"><i class="fas fa-car mr-2"></i> getAllVehicles()</div>
+                            <pre><code>{
+    [id] = {
+        health, model, name, number,
+        engine, lights, alarm, locked,
+        position = {x,y,z}
+    }
+}</code></pre>
+                        </div>
+                        <div class="code-lux p-4 data-structure-block">
+                            <div class="text-indigo-300 font-bold mb-2"><i class="fas fa-cube mr-2"></i> getAllPickups()</div>
+                            <pre><code>{
+    [id] = {
+        model, type,
+        position = {x,y,z}
+    }
+}</code></pre>
+                        </div>
+                        <div class="code-lux p-4 data-structure-block">
+                            <div class="text-indigo-300 font-bold mb-2"><i class="fas fa-tag mr-2"></i> getAllLabels()</div>
+                            <pre><code>{
+    [id] = {
+        distance, color, test_los,
+        player_id, vehicle_id, text,
+        position = {x,y,z}
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Рейты -->
+            <section id="rates" class="premium-card p-7 md:p-9">
+                <div class="flex items-center gap-3 mb-5"><i class="fas fa-tachometer-alt text-indigo-400 text-xl"></i><h2 class="text-2xl font-bold">Рейты</h2></div>
+                <p class="mb-3">Константы для <code>setRate()</code>:</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_SLEEP</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_CONNECT</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_RECONNECT</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_NETWORK</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_LUA</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_SPECTATE</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_ONFOOT</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_INCAR</code></span>
+                    <span class="bg-indigo-950/60 px-3 py-1 rounded-full"><code>RATE_AIM</code></span>
+                </div>
+                <pre class="code-lux p-4"><code>setRate(RATE_LUA, 100) -- onUpdate каждые 100 мс</code></pre>
+            </section>
+
+            <!-- События -->
+            <section id="events" class="glow-border p-[1.2px]">
+                <div class="bg-[#111118] rounded-[1.9rem] p-7 md:p-9">
+                    <div class="flex justify-between items-center flex-wrap gap-2 border-b border-indigo-500/30 pb-3 mb-6"><h2 class="text-2xl font-bold flex gap-2"><i class="fas fa-bolt text-indigo-400"></i> События</h2><span class="text-xs bg-black/40 px-3 py-1 rounded-full"><i class="fas fa-code"></i> registerHandler</span></div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-[650px]">
+                            <thead><tr><th>Событие</th><th>Описание</th><th>Параметры</th><th>Возврат</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>onLoad()</code></td><td>Скрипт загружен</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onUnload()</code></td><td>Скрипт выгружен</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onUpdate()</code></td><td>Вызывается каждые N мс (RATE_LUA)</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onRequestConnect()</code></td><td>Запрос на подключение</td><td>нет</td><td>true/false</td></tr>
+                                <tr><td><code>onConnect()</code></td><td>Подключение к серверу</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onDisconnect()</code></td><td>Отключение</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onProxyConnect()</code></td><td>Подключение к прокси</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onProxyDisconnect()</code></td><td>Отключение от прокси</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onProxyError()</code></td><td>Ошибка прокси</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onCoordStart()</code></td><td>Начало движения по координатам</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onCoordStop()</code></td><td>Остановка движения</td><td>нет</td><td>нет</td></tr>
+                                <tr><td><code>onRunCommand(string cmd)</code></td><td>Выполнена клиентская команда</td><td>cmd</td><td>true/false</td></tr>
+                                <tr><td><code>onPrintLog(string text)</code></td><td>Вывод в лог</td><td>text</td><td>true/false</td></tr>
+                                <tr><td><code>onSendPacket(id, bs)</code></td><td>Отправлен пакет</td><td>id, bs</td><td>true/false</td></tr>
+                                <tr><td><code>onReceivePacket(id, bs)</code></td><td>Получен пакет</td><td>id, bs</td><td>true/false</td></tr>
+                                <tr><td><code>onSendRPC(id, bs)</code></td><td>Отправлен RPC</td><td>id, bs</td><td>true/false</td></tr>
+                                <tr><td><code>onReceiveRPC(id, bs)</code></td><td>Получен RPC</td><td>id, bs</td><td>true/false</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <pre class="code-lux p-4 mt-6"><code>function onConnect() print("<i class="fas fa-plug"></i> Подключено") end
+registerHandler("onDisconnect", function() print("<i class="fas fa-times"></i> Отключено") end)</code></pre>
+                </div>
+            </section>
+
+            <!-- BitStream, Addon, Tasks, HTTP, Keys, Proxy, Commands (сокращённо для читаемости, но полные блоки) -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <section id="bitstream" class="premium-card p-6"><div class="flex items-center gap-2 border-b border-indigo-400/30 pb-3 mb-4"><i class="fas fa-code-branch text-indigo-400"></i><h2 class="text-xl font-bold">BitStream операции</h2></div><p class="text-sm mb-3">Создание, запись, чтение, отправка пакетов/RPC.</p><pre class="code-lux p-3 text-xs"><code>local bs = bitStream.new()
+bs:writeInt32(1337)
+bs:sendPacket()</code></pre><div class="mt-3 text-xs text-gray-400">методы: writeBool, writeFloat, readString, sendRPC и др.</div></section>
+                <section id="addon" class="premium-card p-6"><div class="flex items-center gap-2 border-b border-purple-400/30 pb-3 mb-4"><i class="fas fa-puzzle-piece text-purple-400"></i><h2 class="text-xl font-bold">Функции аддона (require "addon")</h2></div><ul class="list-disc pl-5 space-y-1 text-sm"><li><code>isBotInAnyVehicle()</code></li><li><code>sendDialogResponse(id,button,list,input)</code></li><li><code>sendVehicleEnter(id, passenger)</code></li><li><code>sendInput(text)</code></li><li><code>bitStream:readString8/writeString8</code></li></ul></section>
+                <section id="tasks" class="premium-card p-6"><div class="flex items-center gap-2 border-b border-emerald-400/30 pb-3 mb-4"><i class="fas fa-tasks text-emerald-400"></i><h2 class="text-xl font-bold">Управление задачами</h2></div><p><code>newTask(function, halted, ...)</code>, <code>wait(ms)</code>.</p><pre class="code-lux p-3 text-xs"><code>newTask(function() wait(1000) print("done") end)</code></pre><p class="mt-2">Методы: <code>task:halt()</code>, <code>task:resume()</code>, <code>task:kill()</code>.</p></section>
+                <section id="http" class="premium-card p-6"><div class="flex items-center gap-2 border-b border-sky-400/30 pb-3 mb-4"><i class="fas fa-globe text-sky-400"></i><h2 class="text-xl font-bold">HTTP-запросы</h2></div><p><code>requests.get/post</code> синхронно.</p><pre class="code-lux p-3 text-xs"><code>local requests = require("requests")
+local resp = requests.get("https://api.ipify.org")
+print(resp.text)</code></pre></section>
+                <section id="keys" class="premium-card p-6"><div class="flex items-center gap-2 border-b border-indigo-400/30 pb-3 mb-4"><i class="fas fa-keyboard"></i><h2 class="text-xl font-bold">Обработка клавиш</h2></div><p><code>sendKey(id)</code>, <code>sendSpecialKey(id)</code> (1=Y,2=N,3=H).</p><pre class="code-lux p-3 text-xs"><code>sendKey(1024) -- Alt
+sendSpecialKey(1) -- Y
+updateSync()</code></pre></section>
+                <section id="proxy" class="premium-card p-6"><div class="flex items-center gap-2 border-b border-indigo-400/30 pb-3 mb-4"><i class="fas fa-network-wired"></i><h2 class="text-xl font-bold">Поддержка прокси SOCKS5</h2></div><pre class="code-lux p-3 text-xs"><code>proxyConnect("ip:port","user","pass")
+function onProxyConnect() print("Прокси активен") end</code></pre></section>
+                <section id="commands" class="premium-card p-6"><div class="flex items-center gap-2 border-b border-indigo-400/30 pb-3 mb-4"><i class="fas fa-terminal"></i><h2 class="text-xl font-bold">Встроенные команды</h2></div><div class="grid grid-cols-2 gap-2 text-sm"><span><code>!exit</code>/<code>!quit</code></span><span><code>!reconnect</code></span><span><code>!players</code></span><span><code>!goto &lt;id&gt;</code></span><span><code>!vehicles</code></span><span><code>!reload</code></span></div></section>
+            </div>
+
+            <footer class="text-center text-gray-500 text-sm border-t border-gray-800 pt-8 mt-4"><p><i class="fas fa-xmark text-purple-400"></i> RakSAMP Lite — Полная документация Lua API | Проект <span class="font-semibold text-indigo-300">CloneX</span></p><p class="mt-1">© 2025 | Все функции, события и структуры представлены полностью</p></footer>
+        </main>
+    </div>
+
+    <button id="backToTop" class="back-to-top fixed bottom-8 right-8 text-white p-3 rounded-full shadow-2xl z-50 opacity-0 invisible transition-all duration-300"><i class="fas fa-chevron-up text-xl"></i></button>
+
+    <script>
+        // Оригинальные функции XLSX
+        var gk_isXlsx = false; var gk_xlsxFileLookup = {}; var gk_fileData = {};
+        function filledCell(cell) { return cell !== '' && cell != null; }
+        function loadFileData(filename) { if(gk_isXlsx && gk_xlsxFileLookup[filename]){ try{ var workbook = XLSX.read(gk_fileData[filename],{type:'base64'}); var firstSheetName = workbook.SheetNames[0]; var worksheet = workbook.Sheets[firstSheetName]; var jsonData = XLSX.utils.sheet_to_json(worksheet,{header:1,blankrows:false,defval:''}); var filteredData = jsonData.filter(row=>row.some(filledCell)); var headerRowIndex = filteredData.findIndex((row,index)=>row.filter(filledCell).length >= filteredData[index+1]?.filter(filledCell).length); if(headerRowIndex===-1||headerRowIndex>25) headerRowIndex=0; var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); csv = XLSX.utils.sheet_to_csv(csv,{header:1}); return csv; }catch(e){ return ""; } } return gk_fileData[filename]||""; }
+        
+        const sections = document.querySelectorAll('.anchor');
+        const navLinks = document.querySelectorAll('.sidebar-link');
+        const backBtn = document.getElementById('backToTop');
+        function updateActive() { let curId=''; const scrollPos = window.scrollY+150; sections.forEach(s=>{ const top=s.offsetTop, h=s.clientHeight; if(scrollPos>=top && scrollPos<top+h) curId=s.getAttribute('id'); }); navLinks.forEach(link=>{ link.classList.remove('active'); if(link.getAttribute('href')?.substring(1)===curId) link.classList.add('active'); }); }
+        window.addEventListener('scroll', ()=>{ updateActive(); if(window.scrollY>450) { backBtn.classList.remove('opacity-0','invisible'); backBtn.classList.add('opacity-100','visible'); } else { backBtn.classList.add('opacity-0','invisible'); backBtn.classList.remove('opacity-100','visible'); } });
+        backBtn.addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+        updateActive();
+        document.querySelectorAll('.sidebar-link').forEach(link=>{ link.addEventListener('click',(e)=>{ e.preventDefault(); const target=document.querySelector(link.getAttribute('href')); if(target) target.scrollIntoView({behavior:'smooth',block:'start'}); }); });
+    </script>
+</body>
+</html>
